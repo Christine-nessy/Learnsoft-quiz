@@ -42,10 +42,10 @@ class QAController extends AppBaseController
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'question' => 'required|string',
-            //hiyo ya answers smthg array nimetoa hapa.
             'answers' => 'required|array',
-            'answers.*' => 'required|string',
-            'image' => 'required|mimes:jpeg,png,jpg,gif,svg|max:4048',
+            'answers.*.answer' => 'required|string',
+            'answers.*.is_correct' => 'sometimes|boolean', // Validate is_correct if present
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     
         // If validation fails, redirect back with errors
@@ -53,20 +53,32 @@ class QAController extends AppBaseController
             return redirect()->back()->withErrors($validator)->withInput();
         }
     
-        // Upload the image
-        $imageName = time().'.'.$request->image->extension();  
-        $request->image->move(public_path('images'), $imageName);
+        // Initialize the image name variable
+        $imageName = null;
+    
+        // Check if an image file is present in the request
+        if ($request->hasFile('image')) {
+            // Retrieve the image file from the request
+            $image = $request->file('image');
+    
+            // Generate a unique file name for the image
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+    
+            // Move the uploaded image to the public/images directory
+            $image->move(public_path('images'), $imageName);
+        }
     
         // Store the question
         $question = new Question();
         $question->question = $request->input('question');
-        $question->image = $imageName; // Save the image file name
+        $question->image = $imageName; // Save the image file name or null
         $question->save();
     
         // Store the answers
-        foreach ($request->input('answers') as $answerText) {
+        foreach ($request->input('answers') as $answerData) {
             $answer = new Answer();
-            $answer->answer = $answerText;
+            $answer->answer = $answerData['answer'];
+            $answer->is_correct = $answerData['is_correct'] ?? false; // Default is_correct to false if not provided
             $answer->question_id = $question->id; // Associate answer with the question
             $answer->save();
         }

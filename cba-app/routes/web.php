@@ -40,6 +40,11 @@ Route::get('/getresults', [QuizController::class, 'getAllUserResults'])->name('a
 Route::get('/quiz-setting-index', [QuizManagementController::class, 'index'])->name('quizzes.index');
 Route::get('/quiz-setting-create', [QuizManagementController::class, 'create'])->name('quizzes.create');
 Route::post('/quiz-setting-save', [QuizManagementController::class, 'store'])->name('quizzes.store');
-Route::get('/quiz-setting-show', [QuizManagementController::class, 'show'])->name('quizzes.show');
+Route::get('/quiz-setting-show/{quiz}', [QuizManagementController::class, 'show'])->name('quizzes.show');
+Route::delete('/quizzes/{id}', [QuizManagementController::class, 'destroy'])->name('quizzes.destroy');
+
+
+
 Route::post('/QandA', [QAController::class, 'store'])->name('QA.store');
 Route::get('/start', [QuizController::class, 'start'])->name('quiz.start');
+Route::get('/quizzes/categories', [QuizController::class, 'categories'])->name('quizzes.categories');

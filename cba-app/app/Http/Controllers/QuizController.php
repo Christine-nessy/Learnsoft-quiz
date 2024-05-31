@@ -1,61 +1,31 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\UserAnswer;
-use App\Models\UserTimer; // Import the UserTimer model
-use App\Models\QuizAttempt; // Import the QuizAttempt model
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\QuizAttempt; // Import the QuizAttempt model
+use App\Models\UserTimer;
+use Carbon\Carbon;
 
 class QuizController extends Controller
 {
     public function start()
     {
-        return view('quizzes.start');
-    }
-
-    public function startQuiz()
-    {
         $user = Auth::user();
         $userTimer = UserTimer::firstOrCreate(
             ['user_id' => $user->id],
-            ['start_time' => Carbon::now()]
+            ['start_time' => Carbon::now(), 'quiz_id' => 1]
         );
 
-        return redirect()->route('quiz.show');
+        return view('quizzes.start');
     }
 
-    public function showQuiz(Request $request)
-    {
-        $user = Auth::user();
-        $userTimer = UserTimer::where('user_id', $user->id)->first();
-
-        if (!$userTimer) {
-            return redirect()->route('quiz.start');
-        }
-
-        $startTime = new Carbon($userTimer->start_time);
-        $currentTime = Carbon::now();
-        $elapsedTime = $currentTime->diffInSeconds($startTime);
-        $totalQuizTime = 30 * 60; // 30 minutes
-        $remainingTime = $totalQuizTime - $elapsedTime;
-
-        if ($remainingTime <= 0) {
-            // Handle quiz time expiration
-            return redirect()->route('quiz.submit');
-        }
-
-        $questions = Question::with('answers')->get();
-
-        return view('quiz.show', [
-            'questions' => $questions,
-            'remainingTime' => $remainingTime,
-        ]);
-    }
+//  quizattempt here
 
     public function index()
     {
@@ -68,7 +38,7 @@ class QuizController extends Controller
         $user = Auth::user();
         $answers = $request->input('answers');
 
-        // Clear previous answers for the user to handle resubmission
+        //** */ Clear previous answers for the user to handle resubmission
         UserAnswer::where('user_id', $user->id)->delete();
 
         foreach ($answers as $question_id => $answer_id) {
@@ -99,11 +69,37 @@ class QuizController extends Controller
                 'user' => $user,
                 'totalAttempted' => $totalAttempted,
                 'totalCorrect' => $totalCorrect,
+                //added
                 'score' => $totalAttempted > 0 ? round(($totalCorrect / $totalAttempted) * 100, 0) : 0
             ];
         }
 
         return view('quizzes.results', ['results' => $results]);
     }
-}
 
+    public function showQuiz()
+    {
+        $user = Auth::user();
+        $userTimer = UserTimer::where('user_id', $user->id)->first();
+
+        if (!$userTimer) {
+            return redirect()->route('quiz.start');
+        }
+
+        $startTime = new Carbon($userTimer->start_time);
+        $currentTime = Carbon::now();
+        $elapsedTime = $currentTime->diffInSeconds($startTime);
+        $totalQuizTime = 30 * 60; // 30 minutes
+        $remainingTime = $totalQuizTime - $elapsedTime;
+
+        if ($remainingTime <= 0) {
+            // Handle quiz time expiration
+            return redirect()->route('quiz.submit');
+        }
+
+        return view('quiz.show', [
+            'questions' => $this->getQuestions(),
+            'remainingTime' => $remainingTime
+        ]);
+    }
+}
