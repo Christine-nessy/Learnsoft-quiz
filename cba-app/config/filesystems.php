@@ -39,6 +39,10 @@ return [
             'driver' => 'local',
             'root' => 'public/images',
         ],
+        // 'videos' => [
+        //     'driver' => 'local',
+        //     'root' => 'public/videos',
+        // ],
 
         'public' => [
             'driver' => 'local',
@@ -46,6 +50,12 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
+        ],
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/media'), // Specify the root directory for storing files
+            'url' => env('APP_URL').'/storage/media', // URL for accessing files via the web
+            'visibility' => 'public', // Visibility setting for uploaded files
         ],
 
         's3' => [

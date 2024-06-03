@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\QAController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizManagementController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,3 +50,12 @@ Route::delete('/quizzes/{id}', [QuizManagementController::class, 'destroy'])->na
 Route::post('/QandA', [QAController::class, 'store'])->name('QA.store');
 Route::get('/start', [QuizController::class, 'start'])->name('quiz.start');
 Route::get('/quizzes/categories', [QuizController::class, 'categories'])->name('quizzes.categories');
+Route::get('/upload', [VideoController::class, 'create'])->name('videos.create');
+Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
+// routes/web.php
+
+Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
+
+Route::post('/media/store', [MediaController::class, 'store'])->name('media.store');
+Route::get('/media/index', [MediaController::class, 'index'])->name('media.index');
+Route::get('/media/create', [MediaController::class, 'create'])->name('media.create');

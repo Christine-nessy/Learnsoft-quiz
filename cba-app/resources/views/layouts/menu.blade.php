@@ -32,7 +32,18 @@
         <p>Results</p>
     </a>
 </li>
-
+<!-- <li class="nav-item">
+    <a href="{{ route('videos.store') }}" class="nav-link {{ Request::is('videos*') ? 'active' : '' }}">
+        <i class="fas fa-regular fa-star"></i>
+        <p>Learning Materials</p>
+    </a>
+</li> -->
+<li class="nav-item">
+    <a href="{{ route('media.index') }}" class="nav-link {{ Request::is('media*') ? 'active' : '' }}">
+    <i class="fas fa-regular fa-star"></i>
+        <p>Learning Materials</p>
+    </a>
+</li>
 <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle {{ Request::is('quiz-setting-index*') ? 'active' : '' }}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-solid fa-clipboard"></i>
